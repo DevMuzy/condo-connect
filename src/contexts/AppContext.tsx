@@ -70,8 +70,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setChamados(prev => [novo, ...prev]);
     toast.success('Chamado aberto com sucesso!');
 
-    // Webhook
-    fetch('https://muzyautomacao.app.n8n.cloud/webhook/novo-chamado', {
+    // Webhook 
+    fetch('https://muzyautomacao.app.n8n.cloud/webhook-test/novo-chamado', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
