@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { Input } from '@/components/ui/input';
@@ -30,7 +30,7 @@ export default function LoginPage() {
           <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center mx-auto mb-2">
             <Building2 className="h-6 w-6 text-primary-foreground" />
           </div>
-          <CardTitle>CondoGestão</CardTitle>
+          <CardTitle>Connect.Gestão</CardTitle>
           <CardDescription>Entre com suas credenciais</CardDescription>
         </CardHeader>
         <CardContent>
@@ -48,12 +48,8 @@ export default function LoginPage() {
             </Button>
           </form>
           <div className="mt-4 text-[11px] text-muted-foreground text-center space-y-1">
-            <p className="font-medium">Contas demo:</p>
-            <p>Admin: carlos@admin.com</p>
-            <p>Síndico: maria@sindica.com</p>
-            <p>Morador: joao@morador.com</p>
-            <p className="italic">(qualquer senha)</p>
-          </div>
+            <p className="font-medium">Área do Administrador</p>
+          </div> 
         </CardContent>
       </Card>
     </div>

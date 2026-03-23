@@ -11,13 +11,14 @@ export interface Condominio {
 }
 
 export interface User {
-  id: string;
-  nome: string;
-  email: string;
-  role: UserRole;
-  condominio_id: string;
-  apartamento?: string;
-  telefone?: string;
+  id: string
+  nome: string
+  email: string
+  password: string
+  role: string
+  condominio_id: string
+  apartamento?: string
+  telefone?: string
 }
 
 export interface Chamado {

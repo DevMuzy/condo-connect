@@ -39,8 +39,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [filterStatus, setFilterStatus] = useState<Status | 'TODOS'>('TODOS');
   const [filterPriority, setFilterPriority] = useState<Priority | 'TODOS'>('TODOS');
 
-  const login = useCallback((email: string, _password: string) => {
-    const found = mockUsers.find(u => u.email === email);
+  const login = useCallback((email: string, password: string) => {
+    const found = mockUsers.find(
+      u => u.email === email && u.password === password
+    );
     if (found) {
       setUser(found);
       toast.success(`Bem-vindo, ${found.nome}!`);
@@ -69,11 +71,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     toast.success('Chamado aberto com sucesso!');
 
     // Webhook
-    fetch('https://muzyautomacao.app.n8n.cloud/webhook-test/novo-chamado', {
+    fetch('https://muzyautomacao.app.n8n.cloud/webhook/novo-chamado', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id: novo.id,
+        numero: parseInt(novo.id, 10), // Converte o ID para um número inteiro
         condominio_id: novo.condominio_id,
         nome: novo.nome,
         apartamento: novo.apartamento,
@@ -82,9 +85,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         prioridade: novo.prioridade,
         titulo: novo.titulo,
         descricao: novo.descricao,
+        status: novo.status,
         data_abertura: novo.data_abertura,
       }),
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   const updateChamado = useCallback((id: string, updates: Partial<Pick<Chamado, 'status' | 'responsavel' | 'prioridade'>>) => {
@@ -116,22 +120,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     toast.success('Chamado atualizado');
 
-    fetch('https://muzyautomacao.app.n8n.cloud/webhook-test/atualização', {
+    const chamado = chamados.find(c => c.id === id);
+
+    fetch('https://muzyautomacao.app.n8n.cloud/webhook-test/atualizacao', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, ...updates }),
-    }).catch(() => {});
+      body: JSON.stringify({
+        id,
+        numero: chamado?.numero,
+        ...updates
+      }),
+    }).catch(() => { });
   }, [user]);
 
   const deleteChamado = useCallback((id: string) => {
     setChamados(prev => prev.filter(c => c.id !== id));
     toast.success('Chamado excluído');
 
-    fetch('https://muzyautomacao.app.n8n.cloud/webhook-test/delete', {
+    fetch('https://muzyautomacao.app.n8n.cloud/webhook/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   const toggleDarkMode = useCallback(() => {

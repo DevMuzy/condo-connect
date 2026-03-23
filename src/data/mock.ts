@@ -6,13 +6,20 @@ export const mockCondominios: Condominio[] = [
 ];
 
 export const mockUsers: User[] = [
-  { id: '1', nome: 'Carlos Admin', email: 'carlos@admin.com', role: 'admin', condominio_id: '1' },
-  { id: '2', nome: 'Maria Síndica', email: 'maria@sindica.com', role: 'sindico', condominio_id: '1' },
-  { id: '3', nome: 'João Morador', email: 'joao@morador.com', role: 'morador', condominio_id: '1', apartamento: '204', telefone: '11999887766' },
+
+{ id: '1', nome: 'Admin Almeida', email: 'admin@edalmeida.com', password: 'almeidaadmin', role: 'admin', condominio_id: '1' }
 ];
 
-let nextNum = 8;
+let nextNum = 7;
 
+export function getNextNumero() {
+  nextNum += 1;
+  return nextNum;
+}
+
+
+
+/// Dados mockados na tela de admin 
 export const mockChamados: Chamado[] = [
   { id: '1', numero: 1, condominio_id: '1', usuario_id: '3', nome: 'Rafael Mendes', apartamento: '101', email: 'rafael@email.com', telefone: '11987654321', prioridade: 'ALTA', titulo: 'Vazamento no teto do banheiro', descricao: 'Água pingando do teto do banheiro desde ontem à noite. Parece vir do apartamento de cima.', status: 'NOVO', data_abertura: '2025-03-20T10:30:00', data_atualizacao: '2025-03-20T10:30:00' },
   { id: '2', numero: 2, condominio_id: '1', usuario_id: '3', nome: 'Ana Souza', apartamento: '305', email: 'ana@email.com', telefone: '11976543210', prioridade: 'MEDIA', titulo: 'Interfone não funciona', descricao: 'O interfone do apartamento parou de funcionar há 3 dias.', status: 'EM_ANDAMENTO', responsavel: 'Manutenção Predial', data_abertura: '2025-03-18T14:00:00', data_atualizacao: '2025-03-19T09:00:00' },
@@ -29,10 +36,6 @@ export const mockHistorico: HistoricoChamado[] = [
   { id: '3', chamado_id: '4', campo: 'status', valor_anterior: 'NOVO', valor_novo: 'EM_ANDAMENTO', usuario: 'Maria Síndica', data: '2025-03-20T08:30:00' },
   { id: '4', chamado_id: '4', campo: 'responsavel', valor_anterior: '', valor_novo: 'Técnico Elevadores', usuario: 'Maria Síndica', data: '2025-03-20T08:30:00' },
 ];
-
-export function getNextNumero() {
-  return ++nextNum;
-}
 
 export function getMetrics(chamados: Chamado[]): DashboardMetrics {
   return {
