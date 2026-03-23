@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { Chamado, HistoricoChamado, User, Priority, Status } from '@/types';
 import { mockChamados, mockHistorico, mockUsers, getNextNumero } from '@/data/mock';
 import { toast } from 'sonner';
@@ -31,6 +31,7 @@ export function useApp() {
 }
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+
   const [user, setUser] = useState<User | null>(null);
   const [chamados, setChamados] = useState<Chamado[]>(mockChamados);
   const [historico, setHistorico] = useState<HistoricoChamado[]>(mockHistorico);
@@ -38,6 +39,36 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<Status | 'TODOS'>('TODOS');
   const [filterPriority, setFilterPriority] = useState<Priority | 'TODOS'>('TODOS');
+
+  // 🔄 Atualiza chamados automaticamente do n8n
+  useEffect(() => {
+
+    const carregarChamados = () => {
+
+      fetch('https://muzyautomacao.app.n8n.cloud/webhook-test/chamados')
+        .then(res => res.json())
+        .then(data => {
+
+          if (Array.isArray(data)) {
+            setChamados(data);
+          }
+
+        })
+        .catch(err => {
+          console.log("Erro ao buscar chamados:", err);
+        });
+
+    };
+
+    carregarChamados();
+
+    const interval = setInterval(() => {
+      carregarChamados();
+    }, 5000);
+
+    return () => clearInterval(interval);
+
+  }, []);
 
   const login = useCallback((email: string, password: string) => {
     const found = mockUsers.find(
@@ -58,7 +89,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addChamado = useCallback((data: Omit<Chamado, 'id' | 'numero' | 'status' | 'data_abertura' | 'data_atualizacao'>) => {
+
     const now = new Date().toISOString();
+
     const novo: Chamado = {
       ...data,
       id: crypto.randomUUID(),
@@ -67,16 +100,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       data_abertura: now,
       data_atualizacao: now,
     };
+
     setChamados(prev => [novo, ...prev]);
+
     toast.success('Chamado aberto com sucesso!');
 
-    // Webhook 
+    // 🚀 envia para n8n
     fetch('https://muzyautomacao.app.n8n.cloud/webhook-test/novo-chamado', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         id: novo.id,
-        numero: parseInt(novo.id, 10), // Converte o ID para um número inteiro
+        numero: novo.numero,
         condominio_id: novo.condominio_id,
         nome: novo.nome,
         apartamento: novo.apartamento,
@@ -86,20 +123,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         titulo: novo.titulo,
         descricao: novo.descricao,
         status: novo.status,
-        data_abertura: novo.data_abertura,
+        data_abertura: novo.data_abertura
       }),
-    }).catch(() => { });
+    }).catch(err => {
+      console.log("Erro webhook:", err);
+    });
+
   }, []);
 
   const updateChamado = useCallback((id: string, updates: Partial<Pick<Chamado, 'status' | 'responsavel' | 'prioridade'>>) => {
-    setChamados(prev => prev.map(c => {
-      if (c.id !== id) return c;
-      const updated = { ...c, ...updates, data_atualizacao: new Date().toISOString() };
 
-      // Historico
+    setChamados(prev => prev.map(c => {
+
+      if (c.id !== id) return c;
+
+      const updated = {
+        ...c,
+        ...updates,
+        data_atualizacao: new Date().toISOString()
+      };
+
       const newHistory: HistoricoChamado[] = [];
+
       for (const [key, val] of Object.entries(updates)) {
+
         if (val !== undefined && val !== (c as any)[key]) {
+
           newHistory.push({
             id: crypto.randomUUID(),
             chamado_id: id,
@@ -109,13 +158,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             usuario: user?.nome ?? 'Sistema',
             data: new Date().toISOString(),
           });
+
         }
       }
+
       if (newHistory.length > 0) {
         setHistorico(prev => [...newHistory, ...prev]);
       }
 
       return updated;
+
     }));
 
     toast.success('Chamado atualizado');
@@ -124,39 +176,66 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     fetch('https://muzyautomacao.app.n8n.cloud/webhook-test/atualizacao', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         id,
         numero: chamado?.numero,
         ...updates
       }),
     }).catch(() => { });
-  }, [user]);
+
+  }, [user, chamados]);
 
   const deleteChamado = useCallback((id: string) => {
+
     setChamados(prev => prev.filter(c => c.id !== id));
+
     toast.success('Chamado excluído');
 
-    fetch('https://muzyautomacao.app.n8n.cloud/webhook/delete', {
+    fetch('https://muzyautomacao.app.n8n.cloud/webhook-test/delete', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ id }),
     }).catch(() => { });
+
   }, []);
 
   const toggleDarkMode = useCallback(() => {
+
     setDarkMode(prev => {
+
       const next = !prev;
+
       document.documentElement.classList.toggle('dark', next);
+
       return next;
+
     });
+
   }, []);
 
   return (
     <AppContext.Provider value={{
-      user, chamados, historico, login, logout, addChamado, updateChamado, deleteChamado,
-      darkMode, toggleDarkMode, searchTerm, setSearchTerm,
-      filterStatus, setFilterStatus, filterPriority, setFilterPriority,
+      user,
+      chamados,
+      historico,
+      login,
+      logout,
+      addChamado,
+      updateChamado,
+      deleteChamado,
+      darkMode,
+      toggleDarkMode,
+      searchTerm,
+      setSearchTerm,
+      filterStatus,
+      setFilterStatus,
+      filterPriority,
+      setFilterPriority,
     }}>
       {children}
     </AppContext.Provider>
