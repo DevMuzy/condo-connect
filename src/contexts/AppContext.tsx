@@ -47,7 +47,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       try {
 
-        const response = await fetch("https://muzyautomacao.app.n8n.cloud/webhook-test/chamados");
+        const response = await fetch("https://muzyautomacao.app.n8n.cloud/webhook/chamados");
 
         const data = await response.json();
 
@@ -156,7 +156,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     toast.success('Chamado aberto com sucesso!');
 
     // 🚀 ENVIA PARA N8N
-    fetch('https://muzyautomacao.app.n8n.cloud/webhook-test/novo-chamado', {
+    fetch('https://muzyautomacao.app.n8n.cloud/webhook/novo-chamado', {
 
       method: 'POST',
 
