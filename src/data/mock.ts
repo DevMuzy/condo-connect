@@ -21,6 +21,12 @@ export function getNextNumero() {
 
 /// Dados mockados na tela de admin 
 export const mockChamados: Chamado[] = [
+{ id: '1', numero: 1, condominio_id: '1', usuario_id: '3', nome: 'Rafael Mendes', apartamento: '101', email: 'rafael@email.com', telefone: '11987654321', prioridade: 'ALTA', titulo: 'Vazamento no teto do banheiro', descricao: 'Água pingando do teto do banheiro desde ontem à noite. Parece vir do apartamento de cima.', status: 'NOVO', data_abertura: '2025-03-20T10:30:00', data_atualizacao: '2025-03-20T10:30:00' },
+  { id: '2', numero: 2, condominio_id: '1', usuario_id: '3', nome: 'Ana Souza', apartamento: '305', email: 'ana@email.com', telefone: '11976543210', prioridade: 'MEDIA', titulo: 'Interfone não funciona', descricao: 'O interfone do apartamento parou de funcionar há 3 dias.', status: 'EM_ANDAMENTO', responsavel: 'Manutenção Predial', data_abertura: '2025-03-18T14:00:00', data_atualizacao: '2025-03-19T09:00:00' },
+  { id: '3', numero: 3, condominio_id: '1', usuario_id: '3', nome: 'Juan Muzy', apartamento: '403', email: 'juanmuzy@gmail.com', telefone: '27999255959', prioridade: 'BAIXA', titulo: 'Corredor molhado', descricao: 'Alguém deixou cair água no corredor', status: 'NOVO', responsavel: 'Manutenção Predial', data_abertura: '2025-03-18T14:00:00', data_atualizacao: '2025-03-19T09:00:00' },
+  
+
+
 ];
 
 export const mockHistorico: HistoricoChamado[] = [
